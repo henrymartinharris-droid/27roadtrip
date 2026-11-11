@@ -1,0 +1,526 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Melbourne Road Trip 2027</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* Layout: sticky-free single column. Header with two toggles (tab, language), then either a day-by-day schedule (date column left, timeline right) or the packing checklist (one emphasised list plus a wrapping grid of category lists). */
+:root {
+  --bg: #f3f2ec;
+  --fg: #1e2a24;
+  --muted: #5c6a62;
+  --line: #d7d9cd;
+  --soft: #e8ebdf;
+  --accent: #1f5a46;
+  --accent-ink: #ffffff;
+  --alert: #b8451f;
+  --alert-bg: #f9e6dc;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", "Noto Sans JP", system-ui, sans-serif;
+  --font-body: "Public Sans", "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141c18; --fg: #e8ece4; --muted: #9aa89f; --line: #2c3932; --soft: #1e2924;
+    --accent: #6fcfa4; --accent-ink: #0f2018; --alert: #f2916b; --alert-bg: #2e1d15;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141c18; --fg: #e8ece4; --muted: #9aa89f; --line: #2c3932; --soft: #1e2924;
+  --accent: #6fcfa4; --accent-ink: #0f2018; --alert: #f2916b; --alert-bg: #2e1d15;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+main { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+#root { display: flex; flex-direction: column; gap: 32px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+header { display: flex; flex-direction: column; gap: 14px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+.sub { color: var(--muted); margin: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-weight: 500; font-size: .95rem; color: var(--fg); background: transparent; border: 0; padding: 8px 16px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; margin: 0; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+h2 small { font-family: var(--font-body); font-weight: 500; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+ul { list-style: none; margin: 0; padding: 0; }
+section { min-width: 0; }
+.block { display: flex; flex-direction: column; gap: 14px; }
+.block > h2 { padding-bottom: 6px; border-bottom: 2px solid var(--fg); }
+
+/* Schedule */
+.day { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.day:first-child { padding-top: 6px; }
+.d-date { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin: 0 0 2px; }
+.d-line { margin: 0; overflow-wrap: anywhere; }
+.d-route { font-weight: 500; }
+.d-stay { color: var(--muted); }
+.d-dinner { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+.d-dinner b { font-weight: 600; color: var(--fg); }
+.plan li { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: 10px; padding: 3px 0; }
+.plan .tm { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+.plan .tx { overflow-wrap: anywhere; }
+@media (max-width: 640px) { .day { grid-template-columns: minmax(0, 1fr); } }
+
+/* Checklists */
+.chk label { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; cursor: pointer; border-bottom: 1px solid var(--line); }
+.chk input { flex: none; width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
+.chk .t { min-width: 0; overflow-wrap: anywhere; }
+.chk input:checked ~ .t { color: var(--muted); text-decoration: line-through; }
+.two-col { columns: 2 340px; column-gap: 32px; }
+.two-col li { break-inside: avoid; }
+
+.links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.links a { font-weight: 500; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 420px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.num, th.num { text-align: right; padding-right: 0; white-space: nowrap; }
+tr.total td { font-weight: 700; border-bottom: 0; border-top: 2px solid var(--fg); }
+
+/* Packing */
+.progress { display: flex; flex-direction: column; gap: 8px; }
+.progress-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.count { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+.clear { font: inherit; font-size: .85rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.clear:hover { color: var(--fg); border-color: var(--muted); }
+.priority { background: var(--alert-bg); border: 2px solid var(--alert); border-radius: 10px; padding: 20px max(16px, 3vw); display: flex; flex-direction: column; gap: 10px; }
+.priority h2 { color: var(--alert); font-size: 1.5rem; font-weight: 800; }
+.priority h2 small { color: var(--alert); }
+.priority .chk label { border-bottom-color: color-mix(in srgb, var(--alert) 30%, transparent); }
+.priority .chk input { accent-color: var(--alert); }
+.grid { columns: 300px; column-gap: 36px; }
+.grid section { display: flex; flex-direction: column; gap: 6px; break-inside: avoid; margin-bottom: 32px; }
+.grid h2 { padding-bottom: 6px; border-bottom: 2px solid var(--fg); }
+</style>
+
+<main>
+  <header>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Section" id="tabs">
+        <button type="button" data-tab="schedule" id="tab-schedule"></button>
+        <button type="button" data-tab="packing" id="tab-packing"></button>
+      </div>
+      <div class="seg" role="group" aria-label="Language" id="langs">
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="ja" lang="ja">日本語</button>
+      </div>
+    </div>
+  </header>
+  <div id="root"></div>
+</main>
+
+<script>
+var DAYS = [
+  { d: ["Wed 6 Jan", "1月6日（水）"], r: ["Adelaide to Meningie (~1h35)", "アデレードからメニンジーへ（約1時間35分）"],
+    s: ["Lake Albert Caravan Park", "レイク・アルバート・キャラバンパーク", "Lake Albert Caravan Park Meningie SA"],
+    n: ["Japanese curry", "日本のカレー"],
+    p: [["11:30", "am", "Leave Adelaide", "アデレード出発"], ["1:05", "pm", "Arrive Meningie, lunch in town", "メニンジー到着、町でランチ"], ["2:30", "pm", "Check in; Coorong pelicans and the small playground", "チェックイン。クーロンのペリカンと小さな遊び場"], ["4:00", "pm", "Swim in Lake Albert", "アルバート湖で湖水浴"]] },
+  { d: ["Thu 7 Jan", "1月7日（木）"], r: ["To Boatswain Point (~2h10)", "ボートスウェイン・ポイントへ（約2時間10分）"],
+    s: ["Rob's shed (night 1)", "ロブの小屋、ボートスウェイン・ポイント（1泊目）", "10 Sail St, Boatswain Point SA 5275"], n: ["Yakisoba", "焼きそば"],
+    p: [["10:30", "am", "Leave Meningie", "メニンジー出発"], ["12:40", "pm", "Arrive Boatswain", "ボートスウェイン到着"], ["3:00", "pm", "Paddle at Long Beach", "ロング・ビーチで水遊び"]] },
+  { d: ["Fri 8 Jan", "1月8日（金）"], r: ["Boatswain Point day", "ボートスウェイン・ポイントで過ごす日"],
+    s: ["Rob's shed (night 2)", "ロブの小屋、ボートスウェイン・ポイント（2泊目）", "10 Sail St, Boatswain Point SA 5275"], n: ["Lobster", "ロブスター"],
+    p: [["9:00", "am", "Long Beach", "ロング・ビーチ"], ["12:00", "pm", "Rob activities", "ロブとアクティビティ"]] },
+  { d: ["Sat 9 Jan", "1月9日（土）"], r: ["To Mt Gambier (~1h30)", "マウント・ガンビアへ（約1時間30分）"],
+    s: ["Pine Country Caravan Park, Mt Gambier", "パイン・カントリー・キャラバンパーク、マウント・ガンビア", "Pine Country Caravan Park Mount Gambier SA"], n: ["Belgiorno", "Belgiorno"],
+    p: [["10:30", "am", "Leave Boatswain Point", "ボートスウェイン・ポイント出発"], ["11:00", "am", "Robe supermarket", "ロビーのスーパー"], ["2:00", "pm", "See Kent and Rose", "ケントとローズに会う"], ["3:30", "pm", "Check in; park playground and jumping pillow", "チェックイン。公園の遊び場とジャンピングピロー"], ["5:30", "pm", "Dinner with Ro", "ローと夕食"]] },
+  { d: ["Sun 10 Jan", "1月10日（日）"], r: ["To Budj Bim National Park, near Macarthur (~1h30)", "ブジ・ビム国立公園（マッカーサー近郊）へ（約1時間30分）"],
+    s: ["Budj Bim Campground", "ブジ・ビム・キャンプ場", "Budj Bim Campground VIC"], n: ["Tuna pasta", "ツナパスタ"],
+    p: [["10:30", "am", "Leave Mt Gambier", "マウント・ガンビア出発"], ["11:00", "am", "Supermarket; buy firewood; need supplies for two days", "スーパー。薪を買う。2日分の食料や物資が必要"], ["12:00", "pm", "Arrive Budj Bim", "ブジ・ビム到着"], ["3:00", "pm", "Lake Surprise walk and cave", "レイク・サプライズの散歩と洞窟"], ["7:00", "pm", "Campfire", "たき火"]] },
+  { d: ["Mon 11 Jan", "1月11日（月）"], r: ["To Princetown (~2h15)", "プリンスタウンへ（約2時間15分）"],
+    s: ["Princetown Recreation Reserve", "プリンスタウン・レクリエーション・リザーブ", "Princetown Recreation Reserve VIC"], n: ["Mexican burritos", "メキシカン・ブリトー"],
+    p: [["10:30", "am", "Leave Budj Bim", "ブジ・ビム出発"], ["12:30", "pm", "Lunch in Warrnambool & playground, supermarket", "ウォーナンブールでランチ、遊び場、スーパー"], ["2:30", "pm", "Twelve Apostles lookout", "トゥエルブ・アポストルズ展望台"], ["4:00", "pm", "Arrive and check in", "到着、チェックイン"]] },
+  { d: ["Tue 12 Jan", "1月12日（火）"], r: ["To Apollo Bay (~1h30)", "アポロ・ベイへ（約1時間30分）"],
+    s: ["Alison's BnB (night 1)", "アリソンさんのB&B（1泊目）", "245 Great Ocean Road, Apollo Bay VIC"],
+    p: [["10:00", "am", "Breakfast at Princetown General Store, Cafe & Bar", "プリンスタウン・ジェネラルストア（カフェ＆バー）で朝食"], ["11:00", "am", "Leave Princetown", "プリンスタウン出発"], ["12:00", "pm", "Picnic lunch at Melba Gully", "メルバ・ガリーでピクニックランチ"], ["1:15", "pm", "Otway Tree Walk", "オトウェイ・ツリー・ウォーク"], ["3:00", "pm", "Check in at Alison's BnB; beach and harbour", "アリソンさんのB&Bにチェックイン。ビーチと港"], ["", "Option", "Great Ocean Road Wildlife Park", "グレート・オーシャン・ロード野生動物公園"]] },
+  { d: ["Wed 13 Jan", "1月13日（水）"], r: ["Apollo Bay day", "アポロ・ベイで過ごす日"],
+    s: ["Alison's BnB (night 2)", "アリソンさんのB&B（2泊目）", "245 Great Ocean Road, Apollo Bay VIC"],
+    p: [["3:00", "pm", "Beach and harbour", "ビーチと港"]] },
+  { d: ["Thu 14 Jan", "1月14日（木）"], r: ["Apollo Bay to St Kilda (~2h45)", "アポロ・ベイからセントキルダへ（約2時間45分）"],
+    s: ["Liz's house, St Kilda (night 1)", "リズさんの家、セントキルダ（1泊目）", "30 Esplanade, St Kilda VIC"],
+    p: [["10:30", "am", "Leave Apollo Bay", "アポロ・ベイ出発"], ["1:45", "pm", "Arrive St Kilda", "セントキルダ到着"], ["3:30", "pm", "Luna Park", "ルナパーク"], ["6:00", "pm", "Dinner at Claypots Evening Star", "クレイポッツ・イブニング・スターで夕食"]] },
+  { d: ["Fri 15 Jan", "1月15日（金）"], r: ["Melbourne day", "メルボルンで過ごす日"],
+    s: ["Liz's house, St Kilda (night 2)", "リズさんの家、セントキルダ（2泊目）", "30 Esplanade, St Kilda VIC"],
+    p: [["9:00", "am", "Coffee at Proud Mary Coffee Roasters", "プラウド・メアリー・コーヒー・ロースターズでコーヒー"], ["10:30", "am", "SEA LIFE Melbourne Aquarium", "シーライフ・メルボルン水族館"], ["12:30", "pm", "Croissants at Bakemono Bakers", "ベイクモノ・ベイカーズでクロワッサン"], ["1:30", "pm", "Ian Potter Children's Garden, only if time allows", "時間があればイアン・ポッター・チルドレンズ・ガーデン"], ["2:30", "pm", "Pete's Family in Seaford?", "セフォードのピートさんの家族？"]] },
+  { d: ["Sat 16 Jan", "1月16日（土）"], r: ["To Ballarat (~1h20)", "バララットへ（約1時間20分）"],
+    s: ["BIG4 Ballarat Windmill Holiday Park", "BIG4バララット・ウィンドミル・ホリデーパーク", "BIG4 Ballarat Windmill Holiday Park VIC"], n: ["Soba salad", "そばサラダ"],
+    p: [["10:30", "am", "Leave St Kilda", "セントキルダ出発"], ["12:00", "pm", "Arrive Ballarat, lunch, supermarket", "バララット到着、ランチ、スーパー"], ["2:00", "pm", "Sovereign Hill or Ballarat Wildlife Park", "ソブリン・ヒルまたはバララット野生動物公園"], ["4:30", "pm", "Park pools (indoor heated and toddler), giant jumping pillow, pedal carts", "公園のプール（屋内温水プールと幼児用）、大型ジャンピングピロー、ペダルカート"]] },
+  { d: ["Sun 17 Jan", "1月17日（日）"], r: ["To Halls Gap (~1h50), then Troopers Creek", "ホールズ・ギャップ（約1時間50分）、そのあとトゥルーパーズ・クリークへ"],
+    s: ["Troopers Creek Campground", "トゥルーパーズ・クリーク・キャンプ場", "Troopers Creek Campground Grampians VIC"], n: ["Ramen", "ラーメン"],
+    p: [["10:30", "am", "Leave Ballarat", "バララット出発"], ["12:20", "pm", "Arrive Halls Gap, lunch", "ホールズ・ギャップ到着、ランチ"], ["1:30", "pm", "Halls Gap Zoo", "ホールズ・ギャップ動物園"], ["3:30", "pm", "Ice cream in Halls Gap village; stock up on food, water and firewood", "ホールズ・ギャップの村でアイスクリーム。食料、水、薪を買い足す"], ["4:00", "pm", "Drive to Troopers Creek and set up camp", "トゥルーパーズ・クリークに移動してキャンプ設営"], ["6:30", "pm", "Dinner; fires (banned on Total Fire Ban days)", "夕食。たき火（火災総禁止日は禁止）"]] },
+  { d: ["Mon 18 Jan", "1月18日（月）"], r: ["To Keith via Bordertown (~3h)", "ボーダータウン経由でキースへ（約3時間）"],
+    s: ["Keith Caravan Park, cabin", "キース・キャラバンパーク、キャビン", "Keith Caravan Park SA"], n: ["Mapo tofu", "麻婆豆腐"],
+    p: [["10:30", "am", "Leave Troopers Creek", "トゥルーパーズ・クリーク出発"], ["12:30", "pm", "Arrive Bordertown, lunch", "ボーダータウン到着、ランチ"], ["1:30", "pm", "Bordertown Wildlife Park and Tolmer Park playground", "ボーダータウン野生動物公園とトルマー・パークの遊び場"], ["3:00", "pm", "Drive to Keith (about 30 minutes)", "キースへ移動（約30分）"], ["3:30", "pm", "Check in; Don Moseley Park monorail and playground, bakery a short walk from the park", "チェックイン。ドン・モーズリー・パークのモノレールと遊び場、公園から歩いてパン屋へ"], ["4:30", "pm", "Pool", "プール"]] },
+  { d: ["Tue 19 Jan", "1月19日（火）"], r: ["To Adelaide (~2h)", "アデレードへ（約2時間）"],
+    p: [["10:30", "am", "Leave Keith", "キース出発"], ["12:30", "pm", "Arrive Adelaide", "アデレード到着"]] }
+];
+
+var TODO = [
+  ["Book Otway Fly tickets (Wed 13 Jan)", "オトウェイ・フライのチケットを予約（1月13日）"],
+  ["Book Halls Gap Zoo tickets (Sun 17 Jan)", "ホールズ・ギャップ動物園のチケットを予約（1月17日）"],
+  ["Book SEA LIFE Melbourne Aquarium tickets (Fri 15 Jan)", "シーライフ・メルボルン水族館のチケットを予約（1月15日）"],
+  ["Book Sovereign Hill tickets (Sat 16 Jan)", "ソブリン・ヒルのチケットを予約（1月16日）"],
+  ["Book Melbourne Zoo tickets (not in the plan yet)", "メルボルン動物園のチケットを予約（まだ予定に入っていません）"]
+];
+
+var MAPS = [
+  ["Outbound: Adelaide to St Kilda", "往路：アデレードからセントキルダ", "https://www.google.com/maps/dir/?api=1&origin=Adelaide+SA&destination=St+Kilda+VIC&waypoints=Meningie+SA%7CRobe+SA%7CMount+Gambier+SA%7CBudj+Bim+National+Park+VIC%7CPrincetown+VIC%7CApollo+Bay+VIC&travelmode=driving"],
+  ["Return: St Kilda to Adelaide", "復路：セントキルダからアデレード", "https://www.google.com/maps/dir/?api=1&origin=St+Kilda+VIC&destination=Adelaide+SA&waypoints=Ballarat+VIC%7CTroopers+Creek+Campground+Grampians+VIC%7CKeith+SA&travelmode=driving"]
+];
+
+/* [name en, name ja, dates en, dates ja, cost (0 = free)] */
+var BUDGET = [
+  ["Lake Albert Caravan Park, Meningie", "レイク・アルバート・キャラバンパーク、メニンジー", "6 Jan", "1月6日", 33],
+  ["Rob's shed, Boatswain Point", "ロブの小屋、ボートスウェイン・ポイント", "7–8 Jan", "1月7〜8日", 0],
+  ["Pine Country Caravan Park, Mt Gambier", "パイン・カントリー・キャラバンパーク、マウント・ガンビア", "9 Jan", "1月9日", 54],
+  ["Budj Bim Campground", "ブジ・ビム・キャンプ場", "10 Jan", "1月10日", 31.8],
+  ["Princetown Recreation Reserve", "プリンスタウン・レクリエーション・リザーブ", "11 Jan", "1月11日", 55],
+  ["Alison's BnB, Apollo Bay", "アリソンさんのB&B、アポロ・ベイ", "12–13 Jan", "1月12〜13日", 0],
+  ["Liz's house, St Kilda", "リズさんの家、セントキルダ", "14–15 Jan", "1月14〜15日", 0],
+  ["BIG4 Ballarat Windmill Holiday Park", "BIG4バララット・ウィンドミル・ホリデーパーク", "16 Jan", "1月16日", 71],
+  ["Troopers Creek Campground", "トゥルーパーズ・クリーク・キャンプ場", "17 Jan", "1月17日", 17.8],
+  ["Keith Caravan Park, cabin", "キース・キャラバンパーク、キャビン", "18 Jan", "1月18日", 160],
+  ["Car roof box", "車の屋根用ボックス", "Gear", "ギア", 100],
+  ["Tent", "テント", "Gear", "ギア", 300],
+  ["Tent repair kit and gazebo walls", "テント修理キットとガゼボのウォール", "Gear", "ギア", 120]
+];
+
+var MUST = { en: "Must not forget", ja: "絶対に忘れないもの", items: [
+  ["Tent, poles, pegs and hammer", "テント、ポール、ペグ、ハンマー"],
+  ["Sleeping bags and mattress", "寝袋とマットレス"],
+  ["Pillows for everyone", "全員分の枕", "R"],
+  ["Toys and bedtime books", "おもちゃと寝る前の絵本", "R"],
+  ["First aid kit", "救急セット"],
+  ["Prescription medicines", "処方薬"],
+  ["Sunscreen, hats and sunglasses", "日焼け止め、帽子、サングラス", "R"],
+  ["Gas stove and a spare gas bottle", "ガスコンロと予備のガスボンベ"],
+  ["Drinking water containers", "飲み水用の容器"],
+  ["12V fridge", "12V冷蔵庫"],
+  ["Headlamps or torches, plus spare batteries", "ヘッドランプまたは懐中電灯、予備の電池"],
+  ["Phone, AirPods, car charger and power bank", "スマホ、AirPods、車用充電器、モバイルバッテリー"]
+] };
+
+var CATS = [
+  { en: "Before you leave", ja: "出発前に", items: [
+    ["Repair hole in mesh window of tent", "テントのメッシュ窓の穴を修理する"],
+    ["Check tyre pressure, spare tyre and jack", "タイヤの空気圧、スペアタイヤ、ジャッキを確認する"],
+    ["Download kids' shows", "子ども向け番組をダウンロードする"],
+    ["Charge power bank, phones and torches", "モバイルバッテリー、スマホ、懐中電灯を充電する"]
+  ]},
+  { en: "Shelter and sleeping", ja: "テントと寝具", items: [
+    ["Ground sheet under the tent", "テントの下に敷くグランドシート"],
+    ["Sleeping bags", "寝袋"],
+    ["Sleeping mat (blow up queen?)", "スリーピングマット（クイーンサイズのエアーマット？）"],
+    ["Battery fans for hot nights", "暑い夜用の電池式ファン"],
+    ["Vacuum cleaner", "掃除機"]
+  ]},
+  { en: "Cooking", ja: "調理", items: [
+    ["Pots, frypan and kettle", "鍋、フライパン、やかん"],
+    ["Lighter and matches", "ライターとマッチ"],
+    ["Chopping board and sharp knife", "まな板と包丁"],
+    ["Tongs and spatula", "トングとフライ返し"],
+    ["Tea, coffee and a way to make it", "お茶、コーヒーとそれを淹れる道具"],
+    ["Camp table", "キャンプ用テーブル"]
+  ]},
+  { en: "Dishes and cleanup", ja: "食器と片付け", items: [
+    ["Plates, bowls, cups and cutlery", "皿、ボウル、カップ、カトラリー"],
+    ["Kids' plate, bowl and cup", "子ども用の皿、ボウル、カップ"],
+    ["Wash-up tub, detergent, scourer, tea towels", "洗い桶、洗剤、スポンジ、ふきん"],
+    ["Rubbish bags", "ゴミ袋"],
+    ["Zip bags, foil and cling wrap", "ジップ袋、アルミホイル、ラップ"]
+  ]},
+  { en: "Food and drink", ja: "食べ物と飲み物", items: [
+    ["Breakfast basics: cereal, long-life milk, bread", "朝食の基本：シリアル、ロングライフミルク、パン"],
+    ["Dinner staples: pasta, rice, sauces, tins", "夕食の定番：パスタ、米、ソース、缶詰"],
+    ["Cooking oil, salt, pepper, spreads", "食用油、塩、こしょう、スプレッド"],
+    ["Fresh fruit and veg for the esky", "エスキー（クーラーボックス）に入れる果物と野菜"],
+    ["Snacks for the car and the toddler", "車内と子ども用のおやつ"],
+    ["Reusable water bottles", "繰り返し使える水筒"],
+    ["Cordial or electrolytes for hot days", "暑い日用のジュースの素や電解質飲料"]
+  ]},
+  { o: "R", en: "Toddler", ja: "幼児", items: [
+    ["Spare clothes", "着替え"],
+    ["Undies, nappies, and wipes", "パンツ、おむつ、おしりふき"],
+    ["Sun hat", "日よけ帽子"],
+    ["Bathers", "水着"],
+    ["Sandals", "サンダル"],
+    ["Raincoat and gumboots", "レインコートと長靴"],
+    ["Beach toys and bucket", "砂遊びのおもちゃとバケツ"],
+    ["Balance bike", "ランニングバイク"],
+    ["Kids' camp chair", "子ども用キャンプチェア"],
+    ["Night light or small torch", "常夜灯または小さな懐中電灯"],
+    ["Car entertainment: books, audio, downloaded shows", "車内の娯楽：本、音声、ダウンロードした番組"]
+  ]},
+  { o: "R", en: "Clothing (adults)", ja: "服（大人）", items: [
+    ["Shorts and t-shirts", "半袖シャツと短パン"],
+    ["Jumpers", "セーター"],
+    ["Rain jackets", "レインジャケット"],
+    ["Long pants for cool evenings", "涼しい夜用の長ズボン"],
+    ["Swimmers and towels", "水着とタオル"],
+    ["Pyjamas", "パジャマ"],
+    ["Socks and underwear", "靴下と下着"],
+    ["Walking shoes for Halls Gap", "ホールズ・ギャップ用のウォーキングシューズ"],
+    ["Camping shoes", "キャンプ用の靴"],
+    ["Thongs for the shower block", "シャワー棟用のビーチサンダル"],
+    ["Hats", "帽子"]
+  ]},
+  { en: "Toiletries and health", ja: "洗面用品と健康", items: [
+    ["Toothbrushes and toothpaste", "歯ブラシと歯磨き粉"],
+    ["Soap, shampoo and deodorant", "石けん、シャンプー、デオドラント"],
+    ["Toilet paper", "トイレットペーパー"],
+    ["Hand sanitiser and wet wipes", "手の消毒液とウェットティッシュ"],
+    ["Insect repellent", "虫よけ"],
+    ["Laundry powder", "洗濯洗剤"],
+    ["Coins for park laundries", "パークのコインランドリー用の小銭"]
+  ]},
+  { en: "Camp comfort and gear", ja: "キャンプの快適グッズ", items: [
+    ["Camp chairs for the adults", "大人用キャンプチェア"],
+    ["Lantern for the tent and table", "テントとテーブル用のランタン"],
+    ["Picnic rug", "ピクニックラグ"],
+    ["Multi-tool, rope and cable ties", "マルチツール、ロープ、結束バンド"],
+    ["Duct tape", "ダクトテープ"],
+    ["Bucket", "バケツ"],
+    ["Gazebo", "ガゼボ"],
+    ["Day pack for walks and beach days", "散歩やビーチ用のデイパック"]
+  ]},
+  { en: "Car and road", ja: "車と道中", items: [
+    ["Window sun shades", "窓用サンシェード"],
+    ["Roof rack straps or ratchet ties", "ルーフラック用のストラップまたはラチェットタイダウン"],
+    ["Phone mount", "スマホホルダー"],
+    ["Roadside assistance details", "ロードサービスの連絡先"],
+    ["Rubbish bag for the car", "車用のゴミ袋"]
+  ]},
+  { o: "R", en: "Pool, beach and play", ja: "プール、ビーチ、遊び", items: [
+    ["Goggles and swim aids for the pool", "プール用のゴーグルと浮き具"],
+    ["Beach towels", "ビーチタオル"],
+    ["Cards or a small board game for the evenings", "夜用のトランプや小さなボードゲーム"],
+    ["Colouring-in, stickers and a small toy kit", "塗り絵、シール、小さなおもちゃセット"]
+  ]}
+];
+
+var T = {
+  title: ["Melbourne Road Trip 2027", "メルボルン・ロードトリップ 2027"],
+  sub: ["6–19 January 2027 · Adelaide to Melbourne via the Great Ocean Road, home via Ballarat and Halls Gap", "2027年1月6日〜19日 · アデレードからグレート・オーシャン・ロード経由でメルボルンへ、帰りはバララットとホールズ・ギャップ経由"],
+  tabSchedule: ["Schedule", "日程"], tabPacking: ["Packing list", "パッキングリスト"],
+  hDay: ["Day, route and stay", "日付・ルート・宿泊"], hPlan: ["Plan and highlights", "予定とハイライト"],
+  dinner: ["Dinner: ", "夕食："], todo: ["To do", "やること"], maps: ["Maps", "地図"], budget: ["Running budget", "予算の記録"],
+  colStay: ["Stay", "項目"], colDates: ["Dates", "日付"], colCost: ["Cost", "費用"], free: ["Free", "無料"], total: ["Total so far", "合計"],
+  packed: ["packed", "パッキング済み"], of: ["of", "／"], clear: ["Untick everything", "チェックをすべて外す"], clearArmed: ["Tap again to untick all", "もう一度押すと全部外れます"],
+  listPackLabel: ["Packing progress", "パッキングの進み具合"]
+};
+
+var LANG = "en", TAB = "schedule", PERSON = "H", STATE = {};
+var KEY = "melbourne-road-trip-2027";
+try {
+  var saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {};
+  STATE = saved.ticks || {};
+  if (saved.lang === "ja" || saved.lang === "en") LANG = saved.lang;
+  if (saved.tab === "packing" || saved.tab === "schedule") TAB = saved.tab;
+  if (saved.person === "H" || saved.person === "R") PERSON = saved.person;
+} catch (e) { STATE = {}; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify({ ticks: STATE, lang: LANG, tab: TAB, person: PERSON })); } catch (e) {} }
+
+function L(pair) { return pair[LANG === "ja" ? 1 : 0]; }
+var AB = "245 Great Ocean Road, Apollo Bay VIC", SK = "30 Esplanade, St Kilda VIC", BP = "10 Sail St, Boatswain Point SA 5275";
+/* [English text, Japanese text, Google Maps search] for places named in the plan lines */
+var PLACES = [
+  ["Adelaide", "アデレード", "Adelaide SA"],
+  ["Meningie", "メニンジー", "Meningie SA"],
+  ["Coorong pelicans", "クーロンのペリカン", "Coorong National Park SA"],
+  ["Lake Albert", "アルバート湖", "Lake Albert Meningie SA"],
+  ["Boatswain Point", "ボートスウェイン・ポイント", BP],
+  ["Boatswain", "ボートスウェイン", BP],
+  ["Long Beach", "ロング・ビーチ", "Long Beach Robe SA"],
+  ["Robe supermarket", "ロビーのスーパー", "Supermarket Robe SA"],
+  ["Mt Gambier", "マウント・ガンビア", "Mount Gambier SA"],
+  ["Budj Bim", "ブジ・ビム", "Budj Bim National Park VIC"],
+  ["Lake Surprise", "レイク・サプライズ", "Lake Surprise Budj Bim National Park VIC"],
+  ["Warrnambool", "ウォーナンブール", "Warrnambool VIC"],
+  ["Twelve Apostles lookout", "トゥエルブ・アポストルズ展望台", "Twelve Apostles Lookout VIC"],
+  ["Princetown General Store, Cafe & Bar", "プリンスタウン・ジェネラルストア（カフェ＆バー）", "Princetown General Store VIC"],
+  ["Princetown", "プリンスタウン", "Princetown VIC"],
+  ["Melba Gully", "メルバ・ガリー", "Melba Gully VIC"],
+  ["Otway Tree Walk", "オトウェイ・ツリー・ウォーク", "Otway Fly Treetop Walk VIC"],
+  ["Alison's BnB", "アリソンさんのB&B", AB],
+  ["Beach and harbour", "ビーチと港", "Apollo Bay Harbour VIC"],
+  ["beach and harbour", "ビーチと港", "Apollo Bay Harbour VIC"],
+  ["Great Ocean Road Wildlife Park", "グレート・オーシャン・ロード野生動物公園", "Great Ocean Road Wildlife Park VIC"],
+  ["Apollo Bay", "アポロ・ベイ", AB],
+  ["St Kilda", "セントキルダ", SK],
+  ["Luna Park", "ルナパーク", "Luna Park Melbourne"],
+  ["Claypots Evening Star", "クレイポッツ・イブニング・スター", "Claypots Evening Star St Kilda VIC"],
+  ["Proud Mary Coffee Roasters", "プラウド・メアリー・コーヒー・ロースターズ", "Proud Mary Coffee Roasters Collingwood VIC"],
+  ["SEA LIFE Melbourne Aquarium", "シーライフ・メルボルン水族館", "SEA LIFE Melbourne Aquarium"],
+  ["Bakemono Bakers", "ベイクモノ・ベイカーズ", "Bakemono Bakers Melbourne VIC"],
+  ["Ian Potter Children's Garden", "イアン・ポッター・チルドレンズ・ガーデン", "Ian Potter Children's Garden Melbourne"],
+  ["Ballarat Wildlife Park", "バララット野生動物公園", "Ballarat Wildlife Park VIC"],
+  ["Sovereign Hill", "ソブリン・ヒル", "Sovereign Hill Ballarat VIC"],
+  ["Ballarat", "バララット", "Ballarat VIC"],
+  ["Halls Gap Zoo", "ホールズ・ギャップ動物園", "Halls Gap Zoo VIC"],
+  ["Halls Gap", "ホールズ・ギャップ", "Halls Gap VIC"],
+  ["Troopers Creek", "トゥルーパーズ・クリーク", "Troopers Creek Campground Grampians VIC"],
+  ["Bordertown Wildlife Park", "ボーダータウン野生動物公園", "Bordertown Wildlife Park SA"],
+  ["Tolmer Park", "トルマー・パーク", "Tolmer Park Bordertown SA"],
+  ["Bordertown", "ボーダータウン", "Bordertown SA"],
+  ["Don Moseley Park", "ドン・モーズリー・パーク", "Don Moseley Park Keith SA"],
+  ["Keith", "キース", "Keith SA"]
+];
+function mapsUrl(q) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q); }
+var PLACE_RE = {};
+function linkPlaces(html) {
+  var i = LANG === "ja" ? 1 : 0;
+  var lookup = {};
+  PLACES.forEach(function (p) { lookup[esc(p[i])] = p[2]; });
+  if (!PLACE_RE[i]) {
+    var keys = PLACES.map(function (p) { return esc(p[i]); }).sort(function (a, b) { return b.length - a.length; });
+    PLACE_RE[i] = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|"), "g");
+  }
+  return html.replace(PLACE_RE[i], function (m) {
+    return '<a href="' + mapsUrl(lookup[m]) + '" target="_blank" rel="noopener">' + m + "</a>";
+  });
+}
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function fmtTime(t, ap) { return LANG === "ja" ? (ap === "am" ? "午前" : "午後") + t : t + " " + ap; }
+function money(n) { return "$" + n.toFixed(2); }
+
+function checkList(entries, group, extraClass) {
+  return '<ul class="chk ' + (extraClass || "") + '">' + entries.map(function (e) {
+    var id = group + "-" + e.i;
+    return '<li><label for="' + id + '"><input type="checkbox" id="' + id + '" data-key="' + id + '"' + (STATE[id] ? " checked" : "") + '><span class="t">' + esc(L(e.it)) + "</span></label></li>";
+  }).join("") + "</ul>";
+}
+
+function renderSchedule() {
+  var h = '<section class="block"><h2>' + esc(L(T.tabSchedule)) + '</h2><div>';
+  DAYS.forEach(function (d) {
+    h += '<div class="day"><div><p class="d-date">' + esc(L(d.d)) + '</p><p class="d-line d-route">' + esc(L(d.r)) + "</p>";
+    if (d.s) {
+      var name = esc(L(d.s));
+      h += '<p class="d-line d-stay">' + (d.s[2] ? '<a href="' + mapsUrl(d.s[2]) + '" target="_blank" rel="noopener">' + name + "</a>" : name) + "</p>";
+    }
+    if (d.n) h += '<p class="d-line d-dinner"><b>' + esc(L(T.dinner)) + "</b>" + esc(L(d.n)) + "</p>";
+    h += '</div><ul class="plan">' + d.p.map(function (p) {
+      return '<li><span class="tm">' + esc(p[0] ? fmtTime(p[0], p[1]) : (LANG === "ja" ? "候補" : p[1])) + '</span><span class="tx">' + linkPlaces(esc(LANG === "ja" ? p[3] : p[2])) + "</span></li>";
+    }).join("") + "</ul></div>";
+  });
+  h += "</div></section>";
+
+  h += '<section class="block"><h2>' + esc(L(T.todo)) + "</h2>" + checkList(TODO.map(function (it, i) { return { it: it, i: i }; }), "t") + "</section>";
+
+  h += '<section class="block"><h2>' + esc(L(T.maps)) + '</h2><div class="links">' + MAPS.map(function (m) {
+    return '<a href="' + esc(m[2]) + '" target="_blank" rel="noopener">' + esc(LANG === "ja" ? m[1] : m[0]) + "</a>";
+  }).join("") + "</div></section>";
+
+  var total = 0;
+  h += '<section class="block"><h2>' + esc(L(T.budget)) + '</h2><div class="tablewrap"><table><thead><tr><th>' + esc(L(T.colStay)) + "</th><th>" + esc(L(T.colDates)) + '</th><th class="num">' + esc(L(T.colCost)) + "</th></tr></thead><tbody>";
+  BUDGET.forEach(function (b) {
+    total += b[4];
+    h += "<tr><td>" + esc(LANG === "ja" ? b[1] : b[0]) + "</td><td>" + esc(LANG === "ja" ? b[3] : b[2]) + '</td><td class="num">' + (b[4] ? money(b[4]) : esc(L(T.free))) + "</td></tr>";
+  });
+  h += '<tr class="total"><td>' + esc(L(T.total)) + '</td><td></td><td class="num">' + money(total) + "</td></tr></tbody></table></div></section>";
+  return h;
+}
+
+function renderPacking() {
+  var h = '<div class="seg" role="group" aria-label="Person" id="people"><button type="button" data-person="H" aria-pressed="' + (PERSON === "H") + '">Harry</button><button type="button" data-person="R" aria-pressed="' + (PERSON === "R") + '">Hirry</button></div><div class="progress"><div class="progress-row"><span class="count" id="total"></span><button class="clear" id="clear" type="button">' + esc(L(T.clear)) + '</button></div><div class="bar" role="progressbar" aria-label="' + esc(L(T.listPackLabel)) + '" id="barwrap"><span id="bar"></span></div></div>';
+  var mine = MUST.items.map(function (it, i) { return { it: it, i: i }; }).filter(function (e) { return (e.it[2] || "H") === PERSON; });
+  if (mine.length) h += '<section class="priority"><h2>' + esc(LANG === "ja" ? MUST.ja : MUST.en) + ' <small data-count></small></h2>' + checkList(mine, "p", "two-col") + "</section>";
+  h += '<div class="grid">' + CATS.map(function (c, i) { return { c: c, i: i }; }).filter(function (e) { return (e.c.o || "H") === PERSON; }).map(function (e) {
+    return "<section><h2>" + esc(LANG === "ja" ? e.c.ja : e.c.en) + ' <small data-count></small></h2>' + checkList(e.c.items.map(function (it, j) { return { it: it, i: j }; }), "c" + e.i) + "</section>";
+  }).join("") + "</div>";
+  return h;
+}
+
+function updateCounts() {
+  var scope = document.getElementById("root");
+  if (TAB !== "packing") return;
+  var boxes = scope.querySelectorAll("input[type=checkbox]"), done = 0;
+  boxes.forEach(function (b) { if (b.checked) done++; });
+  var tot = document.getElementById("total");
+  tot.textContent = LANG === "ja" ? boxes.length + " 件中 " + done + " 件パッキング済み" : done + " of " + boxes.length + " packed";
+  var pct = boxes.length ? Math.round(done / boxes.length * 100) : 0;
+  document.getElementById("bar").style.width = pct + "%";
+  document.getElementById("barwrap").setAttribute("aria-valuenow", pct);
+  scope.querySelectorAll("section").forEach(function (s) {
+    var c = s.querySelector("[data-count]");
+    if (!c) return;
+    var bs = s.querySelectorAll("input[type=checkbox]"), d = 0;
+    bs.forEach(function (b) { if (b.checked) d++; });
+    c.textContent = d + "/" + bs.length;
+  });
+}
+
+function render() {
+  document.documentElement.lang = LANG === "ja" ? "ja" : "en";
+  document.getElementById("title").textContent = L(T.title);
+  document.getElementById("sub").textContent = L(T.sub);
+  document.getElementById("tab-schedule").textContent = L(T.tabSchedule);
+  document.getElementById("tab-packing").textContent = L(T.tabPacking);
+  document.querySelectorAll("#tabs button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-tab") === TAB ? "true" : "false"); });
+  document.querySelectorAll("#langs button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === LANG ? "true" : "false"); });
+  document.getElementById("root").innerHTML = (TAB === "schedule") ? renderSchedule() : renderPacking();
+  if (TAB === "packing") wireClear();
+  updateCounts();
+}
+
+var armed = false, timer;
+function wireClear() {
+  var btn = document.getElementById("clear");
+  armed = false;
+  btn.addEventListener("click", function () {
+    if (!armed) {
+      armed = true; btn.textContent = L(T.clearArmed);
+      timer = setTimeout(function () { armed = false; btn.textContent = L(T.clear); }, 3000);
+      return;
+    }
+    clearTimeout(timer); armed = false; btn.textContent = L(T.clear);
+    document.querySelectorAll("#root input[type=checkbox]").forEach(function (b) { delete STATE[b.getAttribute("data-key")]; b.checked = false; });
+    save();
+    updateCounts();
+  });
+}
+
+document.getElementById("root").addEventListener("change", function (e) {
+  var k = e.target && e.target.getAttribute("data-key");
+  if (!k) return;
+  if (e.target.checked) STATE[k] = 1; else delete STATE[k];
+  save(); updateCounts();
+});
+document.getElementById("tabs").addEventListener("click", function (e) {
+  var t = e.target.getAttribute && e.target.getAttribute("data-tab");
+  if (!t) return;
+  TAB = t; save(); render();
+});
+document.getElementById("langs").addEventListener("click", function (e) {
+  var l = e.target.getAttribute && e.target.getAttribute("data-lang");
+  if (!l) return;
+  LANG = l; save(); render();
+});
+
+document.getElementById("root").addEventListener("click", function (e) {
+  var p = e.target.getAttribute && e.target.getAttribute("data-person");
+  if (!p) return;
+  PERSON = p; save(); render();
+});
+
+render();
+</script>
+
+</body></html>
